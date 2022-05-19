@@ -89,4 +89,10 @@ app.use(function(req, res, next) {
     next();
 });
 
+
+app.use(express.static('public'));
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+});
+
 module.exports = app;
