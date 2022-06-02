@@ -13,7 +13,9 @@ module.exports = {
         });
     },
     authenticate: function(req, res, next) {
+        console.log(req.body.userName)
         userModel.findOne({userName:req.body.userName}, function(err, userInfo){
+            console.log(userInfo)
             if (err) {
                 next(err);
             } else {

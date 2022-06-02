@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const passportLocalMongoose = require("passport-local-mongoose");
+const foodRoute = require('./routes/admin-routes');
 
 const dbConfig = require('./config/database.config.js');
 const indexRouter = require('./routes/index');
@@ -91,7 +92,7 @@ app.use(function(req, res, next) {
 
 
 app.use(express.static('public'));
-app.get('*', (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.ejs'));
 });
 
@@ -100,3 +101,25 @@ app.listen((process.env.PORT || 3000), function(){
 });
 
 module.exports = app;
+
+// Swagger
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const SwaggerOptions = require('./swagger.json');
+const swaggerDocument = swaggerJsDoc(SwaggerOptions);
+app.use(express.json())
+app.use((req,res,next)=>{
+    res.setHeader("Access-Control-Allow-Origin",'*');
+    res.setHeader("Access-Control-Allow-Methods",'OPTIONS, GET, POST, PUT, PATCH, DELETE');
+    res.setHeader("Access-Control-Allow-Headers",'Content-Type,Authorization');
+    next();
+})
+app.use('/api', foodRoute);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use((error,req,res,next)=>{
+    console.log(error);
+    const status = error.statusCode || 500;
+    const message = error.message;
+    res.status(status).json({message:message});
+})
+
